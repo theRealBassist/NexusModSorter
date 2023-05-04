@@ -1,0 +1,56 @@
+('D:\\www\\Cameron\\Documents\\Projects\\Programming\\Python\\Skyrim Mod Soter '
+ 'V1\\NexusModSorter\\build\\NexusModSorter\\NexusModSorter.pkg',
+ {'BINARY': True,
+  'DATA': True,
+  'EXECUTABLE': True,
+  'EXTENSION': True,
+  'PYMODULE': True,
+  'PYSOURCE': True,
+  'PYZ': False,
+  'SPLASH': True},
+ [('PYZ-00.pyz',
+   'D:\\www\\Cameron\\Documents\\Projects\\Programming\\Python\\Skyrim Mod '
+   'Soter V1\\NexusModSorter\\build\\NexusModSorter\\PYZ-00.pyz',
+   'PYZ'),
+  ('struct',
+   'D:\\www\\Cameron\\Documents\\Projects\\Programming\\Python\\Skyrim Mod '
+   'Soter V1\\NexusModSorter\\build\\NexusModSorter\\localpycs\\struct.pyc',
+   'PYMODULE'),
+  ('pyimod01_archive',
+   'D:\\www\\Cameron\\Documents\\Projects\\Programming\\Python\\Skyrim Mod '
+   'Soter '
+   'V1\\NexusModSorter\\build\\NexusModSorter\\localpycs\\pyimod01_archive.pyc',
+   'PYMODULE'),
+  ('pyimod02_importers',
+   'D:\\www\\Cameron\\Documents\\Projects\\Programming\\Python\\Skyrim Mod '
+   'Soter '
+   'V1\\NexusModSorter\\build\\NexusModSorter\\localpycs\\pyimod02_importers.pyc',
+   'PYMODULE'),
+  ('pyimod03_ctypes',
+   'D:\\www\\Cameron\\Documents\\Projects\\Programming\\Python\\Skyrim Mod '
+   'Soter '
+   'V1\\NexusModSorter\\build\\NexusModSorter\\localpycs\\pyimod03_ctypes.pyc',
+   'PYMODULE'),
+  ('pyimod04_pywin32',
+   'D:\\www\\Cameron\\Documents\\Projects\\Programming\\Python\\Skyrim Mod '
+   'Soter '
+   'V1\\NexusModSorter\\build\\NexusModSorter\\localpycs\\pyimod04_pywin32.pyc',
+   'PYMODULE'),
+  ('pyiboot01_bootstrap',
+   'C:\\Python311\\Lib\\site-packages\\PyInstaller\\loader\\pyiboot01_bootstrap.py',
+   'PYSOURCE'),
+  ('pyi_rth_inspect',
+   'C:\\Python311\\Lib\\site-packages\\PyInstaller\\hooks\\rthooks\\pyi_rth_inspect.py',
+   'PYSOURCE'),
+  ('NexusModSorter',
+   '\\\\Cameron-NAS\\Primary '
+   'Storage\\www\\Cameron\\Documents\\Projects\\Programming\\Python\\Skyrim '
+   'Mod Soter V1\\NexusModSorter\\NexusModSorter.py',
+   'PYSOURCE')],
+ True,
+ False,
+ False,
+ [],
+ None,
+ None,
+ None)
