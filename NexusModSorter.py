@@ -21,7 +21,7 @@ def getDirectory():
             print ("This is not a valid path. Please try again")
             return(getDirectory())
     elif platform == 'linux':
-        if dirInput[len(dirInput)-1] == '/' and Path(dirInput).isDir():
+        if dirInput[len(dirInput)-1] == '/' and Path(dirInput).is_dir():
             return(dirInput)
         elif Path(dirInput + '/').is_dir():
             return(dirInput + '/')
@@ -46,8 +46,11 @@ def getCategory():
         return categoryInput
     
 def getModID(modFileName):
-    unmoddedModID = modFileName.split(sep,1)[1].strip()
-
+    try:
+        unmoddedModID = modFileName.split(sep,1)[1].strip()
+    except:
+        print("This mod has no ModID")
+        return(0)
     if unmoddedModID[0] == sep:
         unmoddedModID = unmoddedModID[1:].strip()
         getModID(unmoddedModID)
@@ -61,11 +64,11 @@ def getModID(modFileName):
                 modID = unmoddedModID.split(sep,1)[0].strip()
                 return(modID)
             else:
-                print("This mod ID is broken: " + unmoddedModID)
+                print("This ModID is broken: " + unmoddedModID)
                 return(0)
         except Exception as e: 
             print(e)
-            print("This modID is broken " + unmoddedModID)
+            print("This ModID is broken " + unmoddedModID)
             return(0)
 
 def getFileModName(modFileName):
@@ -91,7 +94,7 @@ def checkModName(modFileName, modName):
         return False
 
 def getTitle(nexusCategory, modID):
-    url = 'https://www.nexusmods.com/' + nexusCategory + '/mods/' + modID
+    url = 'https://www.nexusmods.com/' + nexusCategory + '/mods/' + str(modID)
     reqs = requests.get(url)
     soup = BeautifulSoup(reqs.text, 'html.parser')
 
@@ -127,7 +130,7 @@ def moveFile(modPath, filePath, similarity):
 def findAccurateTitle (modID, fileModName, nexusCategory):
     output = []
     for category in validCategories:
-        url = 'https://www.nexusmods.com/' + category + '/mods/' + modID
+        url = 'https://www.nexusmods.com/' + category + '/mods/' + str(modID)
         reqs = requests.get(url)
         soup = BeautifulSoup(reqs.text, 'html.parser')
 
@@ -145,8 +148,14 @@ validCategories = ["skyrimspecialedition", "skyrim", "fallout4", "newvegas", "ob
 
 sortingPath = getDirectory()
 nexusCategory = getCategory()
-unsortedPath = sortingPath + 'UNSORTED\\'
-categoryPath = sortingPath + nexusCategory.upper() + "\\"
+
+if platform == 'win32':
+    unsortedPath = sortingPath + 'UNSORTED\\'
+    categoryPath = sortingPath + nexusCategory.upper() + "\\"
+elif platform == 'linux':
+    unsortedPath = sortingPath + 'UNSORTED/'
+    categoryPath = sortingPath + nexusCategory.upper() + "/"
+
 try:
     mkdir(unsortedPath)
 except Exception as e:
@@ -164,27 +173,41 @@ for file in os.listdir(sortingPath):
     if os.path.isdir(filePath) == False:
         print("filename = " + filename)
 
+        print("I am working with the file: " + filename)
         modID = getModID(filename)
-        print("Mod ID = " + modID)  
-            
-        title = getTitle(nexusCategory, modID)
-        fileModName = getFileModName(filename)
-        similarity = checkModName(fileModName, title)
-        modPath = (categoryPath + title).strip()
+        print("Mod ID = " and modID)  
 
-        if similarity == False:
-            newInfo = findAccurateTitle(modID, fileModName, nexusCategory)
-            newCategoryPath = sortingPath + newInfo[0].upper().strip() + "\\"
-            if newInfo[1] != "modName":
-                title = newInfo[1]
-            try:
-                mkdir(newCategoryPath)
-            except Exception as e:
-                print(newCategoryPath + " already exists")
-            modPath = (newCategoryPath + title).strip()
-            moveFile(modPath, filePath, newInfo[2])
+        if modID != 0:
+            title = getTitle(nexusCategory, modID)
+            fileModName = getFileModName(filename)
+            similarity = checkModName(fileModName, title)
+            modPath = (categoryPath + title).strip()
+
+            if similarity == False:
+                newInfo = findAccurateTitle(modID, fileModName, nexusCategory)
+
+                if platform == 'win32':
+                    newCategoryPath = sortingPath + newInfo[0].upper().strip() + "\\"
+                elif platform == 'linux':
+                    newCategoryPath = sortingPath + newInfo[0].upper().strip() + "/"
+                    
+                if newInfo[1] != "modName":
+                    title = newInfo[1]
+                try:
+                    mkdir(newCategoryPath)
+                except Exception as e:
+                    print(newCategoryPath + " already exists")
+                modPath = (newCategoryPath + title).strip()
+                moveFile(modPath, filePath, newInfo[2])
+            else:
+                moveFile(modPath, filePath, similarity)
         else:
-            moveFile(modPath, filePath, similarity)
+            try:
+                print("This mod has no ModID and will be moved to the UNSORTED path.")
+                shutil.move(filePath, unsortedPath)
+            except Exception as e:
+                print('There was an error moving the file!')
+                print(e)
     else:
         print("This is a directory. Skipping.")
 
