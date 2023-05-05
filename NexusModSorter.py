@@ -6,18 +6,30 @@ import requests
 from bs4 import BeautifulSoup
 import shutil
 from difflib import SequenceMatcher
+from sys import platform
 
 
 def getDirectory():
     print("Input your Nexus mods directory including the drive label. Please use backslashes in path and when terminating the path. E.g. A:\\Nexus Downloads\\")
     dirInput = input("Enter Path: ")
-    if dirInput[len(dirInput)-1] == '\\' and Path(dirInput).is_dir():
-        return(dirInput)
-    elif Path(dirInput + '\\').is_dir():
-        return(dirInput + '\\')
+    if platform == 'win32':
+        if dirInput[len(dirInput)-1] == '\\' and Path(dirInput).is_dir():
+            return(dirInput)
+        elif Path(dirInput + '\\').is_dir():
+            return(dirInput + '\\')
+        else:
+            print ("This is not a valid path. Please try again")
+            return(getDirectory())
+    elif platform == 'linux':
+        if dirInput[len(dirInput)-1] == '/' and Path(dirInput).isDir():
+            return(dirInput)
+        elif Path(dirInput + '/').is_dir():
+            return(dirInput + '/')
+        else:
+            print ("This is not a valid path. Please try again")
+            return(getDirectory())
     else:
-        print ("This is not a valid path. Please try again")
-        return(getDirectory())
+        print("It appears you are not using Linux or Windows. Please make an issue on Github and let me know that some people actually use MacOS or something.")
 
 def getCategory():
     print("Input what category the majority of your mods belong to. Please use the category as it appears in the url for a mod. E.g. 'skyrimspecialedition' instead of 'Skyrim Special Edtion'")
@@ -32,16 +44,6 @@ def getCategory():
             return(getCategory())
     else:
         return categoryInput
-
-def getTitle(nexusCategory, modID):
-    url = 'https://www.nexusmods.com/' + nexusCategory + '/mods/' + modID
-    reqs = requests.get(url)
-    soup = BeautifulSoup(reqs.text, 'html.parser')
-
-    for title in soup.find('title'):
-        title = title.get_text().split(sep,1)[0]
-        title = title.split(" at ")[0]
-    return title
     
 def getModID(modFileName):
     unmoddedModID = modFileName.split(sep,1)[1].strip()
