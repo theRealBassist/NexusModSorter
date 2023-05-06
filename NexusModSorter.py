@@ -128,7 +128,7 @@ workingDir = getDirectory()
 nexusCategory = getCategory()
 
 unsortedPath = os.path.join(workingDir, "UNSORTED")
-categoryPath = os.path.join(workingDir, nexusCategory)
+categoryPath = os.path.join(workingDir, nexusCategory.upper())
 
 
 try:
@@ -144,7 +144,7 @@ except:
 for file in os.listdir(workingDir):
     sep = '-'
     filename = os.fsdecode(file)
-    filePath = workingDir + filename
+    filePath = os.path.join(workingDir, filename)
     if os.path.isdir(filePath) == False:
         print("filename = " + filename)
 
@@ -156,7 +156,7 @@ for file in os.listdir(workingDir):
             title = getTitle(nexusCategory, modID)
             fileModName = filename.split(sep,1)[0].strip()
             similarity = isSimilar(fileModName, title)
-            modPath = (categoryPath + title).strip()
+            modPath = os.path.join(categoryPath,title.strip())
 
             if similarity == False:
                 newInfo = findAccurateTitle(modID, fileModName, nexusCategory)
