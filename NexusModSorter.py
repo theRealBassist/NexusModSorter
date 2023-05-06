@@ -106,7 +106,6 @@ def moveFile(modPath, filePath, similarity):
     return
 
 def findAccurateTitle (modID, fileModName, nexusCategory):
-    output = []
     for category in validCategories:
         url = 'https://www.nexusmods.com/' + category + '/mods/' + str(modID)
         reqs = requests.get(url)
