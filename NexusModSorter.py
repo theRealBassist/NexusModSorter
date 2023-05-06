@@ -61,19 +61,12 @@ def getModID(modFileName):
 
 def isSimilar(modFileName, modName):
     similarityRatio = SequenceMatcher(None, modFileName.lower(), modName.lower()).ratio()
-    if similarityRatio >= 0.75:
-        return True
-    else:
-        return False
-    
-def isSameName(modFileName, modName):
     if modName.find(modFileName) >= 0 or modFileName.find(modName) >=0:
-        return True
+        isContained = True
     else:
-        return False
+        isContained = False
 
-def checkModName(modFileName, modName):
-    if isSimilar(modFileName, modName) == True or isSameName(modFileName, modName) == True:
+    if similarityRatio >= 0.75 or isContained == True:
         return True
     else:
         return False
@@ -120,7 +113,7 @@ def findAccurateTitle (modID, fileModName, nexusCategory):
         soup = BeautifulSoup(reqs.text, 'html.parser')
 
         modName = soup.find('title').get_text().split(sep,1)[0].split(" at ")[0]
-        similarity = checkModName(fileModName, modName)
+        similarity = isSimilar(fileModName, modName)
         if similarity == True:
             output = [category, modName, similarity]
             return output
@@ -162,7 +155,7 @@ for file in os.listdir(workingDir):
         if modID != 0:
             title = getTitle(nexusCategory, modID)
             fileModName = filename.split(sep,1)[0].strip()
-            similarity = checkModName(fileModName, title)
+            similarity = isSimilar(fileModName, title)
             modPath = (categoryPath + title).strip()
 
             if similarity == False:
