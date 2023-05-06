@@ -134,15 +134,12 @@ def findAccurateTitle (modID, fileModName, nexusCategory):
 
 validCategories = ["skyrimspecialedition", "skyrim", "fallout4", "newvegas", "oblivion", "stardewvalley", "fallout3", "cyberpunk2077", "witcher3", "dragonage", "mountandblade2bannerlord", "bladeandsorcery", "monsterhunterworld", "morrowind", "dragonage2"]
 
-sortingPath = getDirectory()
+workingDir = getDirectory()
 nexusCategory = getCategory()
 
-if platform == 'win32':
-    unsortedPath = sortingPath + 'UNSORTED\\'
-    categoryPath = sortingPath + nexusCategory.upper() + "\\"
-elif platform == 'linux':
-    unsortedPath = sortingPath + 'UNSORTED/'
-    categoryPath = sortingPath + nexusCategory.upper() + "/"
+unsortedPath = os.path.join(workingDir, "UNSORTED")
+categoryPath = os.path.join(workingDir, nexusCategory)
+
 
 try:
     mkdir(unsortedPath)
@@ -154,10 +151,10 @@ try:
 except:
     print(categoryPath + " already exists!")
 
-for file in os.listdir(sortingPath):
+for file in os.listdir(workingDir):
     sep = '-'
     filename = os.fsdecode(file)
-    filePath = sortingPath + filename
+    filePath = workingDir + filename
     if os.path.isdir(filePath) == False:
         print("filename = " + filename)
 
@@ -173,19 +170,15 @@ for file in os.listdir(sortingPath):
 
             if similarity == False:
                 newInfo = findAccurateTitle(modID, fileModName, nexusCategory)
+                newCategoryPath = os.path.join(workingDir, newInfo[0].upper().strip())
 
-                if platform == 'win32':
-                    newCategoryPath = sortingPath + newInfo[0].upper().strip() + "\\"
-                elif platform == 'linux':
-                    newCategoryPath = sortingPath + newInfo[0].upper().strip() + "/"
-                    
                 if newInfo[1] != "modName":
                     title = newInfo[1]
                 try:
                     mkdir(newCategoryPath)
                 except Exception as e:
                     print(newCategoryPath + " already exists")
-                modPath = (newCategoryPath + title).strip()
+                modPath = os.path.join(newCategoryPath, title.strip())
                 moveFile(modPath, filePath, newInfo[2])
             else:
                 moveFile(modPath, filePath, similarity)
