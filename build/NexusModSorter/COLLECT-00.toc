@@ -2,8 +2,8 @@
    'D:\\www\\Cameron\\Documents\\Projects\\Programming\\Python\\Skyrim Mod '
    'Soter V1\\NexusModSorter\\build\\NexusModSorter\\NexusModSorter.exe',
    'EXECUTABLE'),
-  ('python311.dll', 'C:\\Python311\\python311.dll', 'BINARY'),
   ('VCRUNTIME140.dll', 'C:\\Python311\\VCRUNTIME140.dll', 'BINARY'),
+  ('python311.dll', 'C:\\Python311\\python311.dll', 'BINARY'),
   ('_decimal.pyd', 'C:\\Python311\\DLLs\\_decimal.pyd', 'EXTENSION'),
   ('_hashlib.pyd', 'C:\\Python311\\DLLs\\_hashlib.pyd', 'EXTENSION'),
   ('select.pyd', 'C:\\Python311\\DLLs\\select.pyd', 'EXTENSION'),
