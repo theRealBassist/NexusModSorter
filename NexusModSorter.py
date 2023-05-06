@@ -59,9 +59,6 @@ def getModID(modFileName):
             print("This ModID is broken " + unmoddedModID)
             return(0)
 
-def getFileModName(modFileName):
-    return modFileName.split(sep,1)[0].strip()
-
 def isSimilar(modFileName, modName):
     similarityRatio = SequenceMatcher(None, modFileName.lower(), modName.lower()).ratio()
     if similarityRatio >= 0.75:
@@ -164,7 +161,7 @@ for file in os.listdir(workingDir):
 
         if modID != 0:
             title = getTitle(nexusCategory, modID)
-            fileModName = getFileModName(filename)
+            fileModName = filename.split(sep,1)[0].strip()
             similarity = checkModName(fileModName, title)
             modPath = (categoryPath + title).strip()
 
