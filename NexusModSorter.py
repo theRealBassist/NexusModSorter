@@ -9,7 +9,6 @@ from difflib import SequenceMatcher
 from sys import platform
 
 
-
 def getDirectory():
     print("Please enter the directory where you can find your mod files.")
     workingDir = Path(input("Enter Path: "))
