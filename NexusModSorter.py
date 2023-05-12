@@ -144,7 +144,7 @@ except:
 for file in os.listdir(workingDir):
     sep = '-'
     filename = os.fsdecode(file)
-    filePath = os.path.abspath(file)
+    filePath = os.path.join(workingDir, file)
     if os.path.isdir(filePath) == False:
         print("filename = " + filename)
 
