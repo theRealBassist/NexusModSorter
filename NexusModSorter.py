@@ -33,12 +33,13 @@ def getCategory():
     else:
         return categoryInput
     
-def getModID(modFileName):
+def getModID(filename):
     try:
-        unmoddedModID = modFileName.split(sep,1)[1].strip()
+        unmoddedModID = filename.split(sep,1)[1].strip()
     except:
         print("This mod has no ModID")
         return(0)
+    
     if unmoddedModID[0] == sep:
         unmoddedModID = unmoddedModID[1:].strip()
         getModID(unmoddedModID)
@@ -148,36 +149,38 @@ for file in os.listdir(workingDir):
         print("filename = " + filename)
 
         print("I am working with the file: " + filename)
+        
         modID = getModID(filename)
-        print("Mod ID = " and modID)  
-
-        if modID != 0:
-            title = getTitle(nexusCategory, modID)
-            fileModName = filename.split(sep,1)[0].strip()
-            similarity = isSimilar(fileModName, title)
-            modPath = os.path.join(categoryPath,title.strip())
-
-            if similarity == False:
-                newInfo = findAccurateTitle(modID, fileModName, nexusCategory)
-                newCategoryPath = os.path.join(workingDir, newInfo[0].upper().strip())
-
-                if newInfo[1] != "modName":
-                    title = newInfo[1]
-                try:
-                    mkdir(newCategoryPath)
-                except Exception as e:
-                    print(newCategoryPath + " already exists")
-                modPath = os.path.join(newCategoryPath, title.strip())
-                moveFile(modPath, filePath, newInfo[2])
-            else:
-                moveFile(modPath, filePath, similarity)
-        else:
+        if modID == 0:
             try:
                 print("This mod has no ModID and will be moved to the UNSORTED path.")
                 shutil.move(filePath, unsortedPath)
             except Exception as e:
                 print('There was an error moving the file!')
                 print(e)
+            continue
+
+        print("Mod ID = " and modID)  
+
+        title = getTitle(nexusCategory, modID)
+        fileModName = filename.split(sep,1)[0].strip()
+        similarity = isSimilar(fileModName, title)
+        modPath = os.path.join(categoryPath,title.strip())
+
+        if similarity == False:
+            newInfo = findAccurateTitle(modID, fileModName, nexusCategory)
+            newCategoryPath = os.path.join(workingDir, newInfo[0].upper().strip())
+
+            if newInfo[1] != "modName":
+                title = newInfo[1]
+            try:
+                mkdir(newCategoryPath)
+            except Exception as e:
+                print(newCategoryPath + " already exists")
+            modPath = os.path.join(newCategoryPath, title.strip())
+            moveFile(modPath, filePath, newInfo[2])
+        else:
+            moveFile(modPath, filePath, similarity)
     else:
         print("This is a directory. Skipping.")
 
