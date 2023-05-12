@@ -149,7 +149,7 @@ for file in os.listdir(workingDir):
         print("filename = " + filename)
 
         print("I am working with the file: " + filename)
-        
+
         modID = getModID(filename)
         if modID == 0:
             try:
@@ -185,16 +185,3 @@ for file in os.listdir(workingDir):
         print("This is a directory. Skipping.")
 
 print("Complete")
-
-        
-
-        
-
-
-
-
-
-    
-
-
-
