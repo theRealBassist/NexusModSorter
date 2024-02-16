@@ -8,7 +8,13 @@ import shutil
 from difflib import SequenceMatcher
 from sys import platform
 import tkinter
+import threading
 
+
+modsToSearch = []  
+threads = []
+
+validCategories = ["skyrimspecialedition", "skyrim", "fallout4", "newvegas", "oblivion", "stardewvalley", "fallout3", "cyberpunk2077", "witcher3", "dragonage", "mountandblade2bannerlord", "bladeandsorcery", "monsterhunterworld", "morrowind", "dragonage2"]
 
 def getDirectory(): #responsible for displaying the UI and collecting desired selections
     
@@ -25,20 +31,6 @@ def getDirectory(): #responsible for displaying the UI and collecting desired se
             return workingDir
         else:
             print("This is not a valid directory! Please try again.")
-
-def getCategory():
-    print("Input what category the majority of your mods belong to. Please use the category as it appears in the url for a mod. E.g. 'skyrimspecialedition' instead of 'Skyrim Special Edtion'")
-    categoryInput = input ("Enter Category: ")
-
-    if categoryInput not in validCategories:
-        print("The category you entered is either incorrect or is not one of the most common categories.")
-        categoryResponse = input("Are you sure you want to continue? (Y/N): ")
-        if categoryResponse == "Y":
-            return categoryInput
-        else:
-            return(getCategory())
-    else:
-        return categoryInput
     
 def getModID(filename):
     try:
@@ -68,85 +60,101 @@ def getModID(filename):
             return(0)
 
 def isSimilar(modFileName, modName):
-    similarityRatio = SequenceMatcher(None, modFileName.lower(), modName.lower()).ratio()
+    strippedModFileName = modFileName.split("-", 1)[0]
+    similarityRatio = SequenceMatcher(None, strippedModFileName.lower(), modName.lower()).ratio()
     if modName.find(modFileName) >= 0 or modFileName.find(modName) >=0:
         isContained = True
     else:
         isContained = False
 
-    if similarityRatio >= 0.75 or isContained == True:
+    if similarityRatio >= 0.70 or isContained == True:
         return True
     else:
         return False
 
-def getTitle(nexusCategory, modID):
-    url = 'https://www.nexusmods.com/' + nexusCategory + '/mods/' + str(modID)
-    reqs = requests.get(url)
-    soup = BeautifulSoup(reqs.text, 'html.parser')
-
-    title = soup.find('title').get_text().split(sep,1)[0].split(" at ")[0]
-    return title
-
-def moveFile(modPath, filePath, similarity):
-    if os.path.isdir(modPath) and similarity == True:
+def moveFile(mod):
+    sourcePath = os.path.join(mod[2])
+    destinationPath = os.path.join(workingDir, mod[3].upper(), mod[4])
+    if os.path.isdir(destinationPath):
         try:
-            shutil.move(filePath, modPath)
-        except Exception as e:
-            print('There was an error moving the file!')
-            print(e)
-    elif similarity == True:
-        try:
-            mkdir(modPath)
-        except:
-            print(modPath + " already exists!")
-        try:
-            shutil.move(filePath, modPath)
+            shutil.move(sourcePath, destinationPath)
         except Exception as e:
             print('There was an error moving the file!')
             print(e)
     else:
-        print("Mod name appears very different than the file name")            
         try:
-            shutil.move(filePath, unsortedPath)
+            mkdir(destinationPath)
+        except:
+            print(destinationPath + " already exists!")
+        try:
+            shutil.move(sourcePath, destinationPath)
         except Exception as e:
             print('There was an error moving the file!')
             print(e)
-    return
 
-def findAccurateTitle (modID, fileModName, nexusCategory):
-    for category in validCategories:
-        url = 'https://www.nexusmods.com/' + category + '/mods/' + str(modID)
-        reqs = requests.get(url)
-        soup = BeautifulSoup(reqs.text, 'html.parser')
+def titleSearch (modID, modFileName, categoryToSearch):
+    url = f'https://www.nexusmods.com/{categoryToSearch}/mods/{str(modID)}'
+    reqs = requests.get(url)
+    soup = BeautifulSoup(reqs.text, 'html.parser')
 
-        modName = soup.find('title').get_text().split(sep,1)[0].split(" at ")[0]
-        similarity = isSimilar(fileModName, modName)
-        if similarity == True:
-            output = [category, modName, similarity]
-            return output
+    modName = soup.find('title').get_text().split(sep,1)[0].split(" at ")[0]
+    similarity = isSimilar(modFileName, modName)
+    if similarity == True:
+        return [categoryToSearch, modName]
+    else:
+        return False
+            
+def iterateCategories (mod, category=0):
+    modID = mod[0]
+    filename = mod[1]
+    currentCategory = category
+    print(f'ModID = {modID}, filename = {filename}, currentCategory = {currentCategory}')
+    while currentCategory < len(validCategories):
+        foundTitle = titleSearch(modID, filename, validCategories[currentCategory])
+        if  foundTitle == False:
+            print (f'Not {validCategories[currentCategory]}')
+            currentCategory += 1
+            iterateCategories(mod, currentCategory)
         else:
-            print("Not from " + category)
-    output = [nexusCategory, "modName", similarity]
-    return output    
+            print (f'Found in {validCategories[currentCategory]}')
+            mod.append(foundTitle[0])
+            mod.append(foundTitle[1])
+            foundModTitles.append(mod)
+            return foundModTitles
+        break
 
-validCategories = ["skyrimspecialedition", "skyrim", "fallout4", "newvegas", "oblivion", "stardewvalley", "fallout3", "cyberpunk2077", "witcher3", "dragonage", "mountandblade2bannerlord", "bladeandsorcery", "monsterhunterworld", "morrowind", "dragonage2"]
+def parallelModSearch():
+    global foundModTitles
+    foundModTitles = []
+    for mod in modsToSearch:
+        print(f'mod = {mod}')
+        thread = threading.Thread(target=iterateCategories, args=(mod, 0))
+        threads.append(thread)
+    for thread in threads:
+        thread.start()
+    for thread in threading.enumerate():
+        if thread.daemon:
+            continue
+        try:
+            thread.join()
+        except RuntimeError as err:
+            if 'cannot join current thread' in err.args[0]:
+                # catchs main thread
+                continue
+            else:
+                raise
+    #return foundModTitles
+
+
+
 
 workingDir = getDirectory()
-nexusCategory = getCategory()
-
 unsortedPath = os.path.join(workingDir, "UNSORTED")
-categoryPath = os.path.join(workingDir, nexusCategory.upper())
-
 
 try:
     mkdir(unsortedPath)
 except Exception as e:
     print(unsortedPath + " already exists!")
-
-try:
-    mkdir(categoryPath)
-except:
-    print(categoryPath + " already exists!")
 
 for file in os.listdir(workingDir):
     sep = '-'
@@ -168,27 +176,13 @@ for file in os.listdir(workingDir):
             continue
 
         print("Mod ID = " and modID)  
+        output = [modID, filename, filePath]
+        modsToSearch.append(output)
 
-        title = getTitle(nexusCategory, modID)
-        fileModName = filename.split(sep,1)[0].strip()
-        similarity = isSimilar(fileModName, title)
-        modPath = os.path.join(categoryPath,title.strip())
-
-        if similarity == False:
-            newInfo = findAccurateTitle(modID, fileModName, nexusCategory)
-            newCategoryPath = os.path.join(workingDir, newInfo[0].upper().strip())
-
-            if newInfo[1] != "modName":
-                title = newInfo[1]
-            try:
-                mkdir(newCategoryPath)
-            except Exception as e:
-                print(newCategoryPath + " already exists")
-            modPath = os.path.join(newCategoryPath, title.strip())
-            moveFile(modPath, filePath, newInfo[2])
-        else:
-            moveFile(modPath, filePath, similarity)
-    else:
-        print("This is a directory. Skipping.")
-
-print("Complete")
+parallelModSearch()
+print (foundModTitles)
+for mod in foundModTitles:
+    categoryPath = os.path.join(workingDir, mod[3].upper())
+    if not os.path.isdir(categoryPath):
+        mkdir(categoryPath)
+    moveFile(mod)
