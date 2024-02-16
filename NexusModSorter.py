@@ -7,17 +7,24 @@ from bs4 import BeautifulSoup
 import shutil
 from difflib import SequenceMatcher
 from sys import platform
+import tkinter
 
 
-def getDirectory():
-    print("Please enter the directory where you can find your mod files.")
-    workingDir = Path(input("Enter Path: "))
-
-    if workingDir.is_dir() == True:
-        return workingDir
-    else:
-        print("This is not a valid directory! Please try again.")
-        return(getDirectory())
+def getDirectory(): #responsible for displaying the UI and collecting desired selections
+    
+    print("NexusModSorter")
+    print("===============")
+    
+    while True:
+        try:
+            tkinter.Tk().withdraw()
+            workingDir = tkinter.filedialog.askdirectory(initialdir = "/", title = "Select the directory which contains your images") #Tkinter allows for the creation of pop-up file directories
+        except:
+            workingDir = input("Enter the full file path of the folder where your mods are stored:\n")
+        if os.path.exists(workingDir): #pathlib is incompatible with pyinstaller, so I'm using os.path
+            return workingDir
+        else:
+            print("This is not a valid directory! Please try again.")
 
 def getCategory():
     print("Input what category the majority of your mods belong to. Please use the category as it appears in the url for a mod. E.g. 'skyrimspecialedition' instead of 'Skyrim Special Edtion'")
