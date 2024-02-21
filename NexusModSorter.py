@@ -19,8 +19,6 @@ def getValidCategories():
     firefox_options = Options()
     firefox_options.add_argument("--headless")
     firefox_options.page_load_strategy = 'normal'
-    firefox_options.add_argument("--headless")
-    firefox_options.page_load_strategy = 'normal'
 
     driver = webdriver.Firefox(options=firefox_options)
     driver.get ("https://www.nexusmods.com/games")
